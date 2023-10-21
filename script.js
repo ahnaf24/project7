@@ -16,7 +16,7 @@ window.addEventListener('load', function(){
                 this.keys.push(e.key);
                }
             });
-            window.addEventListener('keyUp', e => { 
+            window.addEventListener('keyup', e => { 
                 if (e.key === 'ArrowDown' ||
                     e.key === 'ArrowUp' ||
                     e.key === 'ArrowLeft' ||
@@ -29,8 +29,8 @@ window.addEventListener('load', function(){
 
     class Player {
         constructor(gameWidth, gameHeight){
-            this.gameWidth = this.gameWidth;
-            this.gameHeight = this.gameHeight;
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
             this.width = 200;
             this.height = 200;
             this.x = 0;
@@ -40,6 +40,7 @@ window.addEventListener('load', function(){
             this.frameY = 0;
             this.speed = 0;
             this.vy = 0;
+            this.weight = -1;
         }
         draw(context){
             context.fillstyle = 'white'; 
@@ -47,19 +48,33 @@ window.addEventListener('load', function(){
             context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(input){
-            //horizontal movement
-            this.x += this.speed;
+           
             if(input.keys.indexOf('ArrowRight') > -1){
                 this.speed = 5;
-            } else if (input.keys.indexOf('ArrowRight') > -1){
+            } else if (input.keys.indexOf('ArrowLeft') > -1){
                 this.speed = -5;
-            } else if (input.keys.indexOf('ArrowRight') > -1){
-                this.vy -= 30;
+            } else if (input.keys.indexOf('ArrowUp') > -1 && this.onGround()){
+                this.vy -= 32;
             }else {
                 this.speed = 0;
             }
+            //horizontal movement
+            this.x += this.speed;
             if(this.x < 0) this.x = 0;
             else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+            //verticale movement
+            this.y += this.vy;
+            if (!this.onGround()){
+               this.vy += this.weight;
+               this.frameY = 1;
+            } else {
+                this.vy = 0;
+                this.frameY = 0;
+            }
+            if(this.y > this.gameHeight -this.height) this.y = this.gameHeight - this.height;
+        }
+        onGround(){
+            return this.y >= this.gameHeight - this.height;
         }
 
     }
